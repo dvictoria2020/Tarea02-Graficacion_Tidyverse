@@ -69,3 +69,24 @@ rios_sumarizado_x_mes <-
 rios_sumarizado_x_mes
 ```
 
+```{r}
+# Generación de gráfico de barras apiladas
+rios_sumarizado_x_mes_ <-
+  rios %>%
+  dplyr::count(fecha, suma_caudal_pandora, suma_caudal_banano)
+
+# Grafico de barras apiladas
+ggplot(
+  rios_sumarizado_x_mes_,
+  aes(x = fecha, y = n)
+  ) +
+  geom_col() +
+  coord_flip()
+
+rlang::last_error()
+```
+
+
+
+
+
