@@ -2,5 +2,37 @@
 title: "Tarea #2 Graficación y Tidyverse"
 output: html_document
 ---
+```{r}
+# dplyr
+library(dplyr)
+```
+
+
+## 1. Gráfico de barras apiladas que muestre el caudal de los ríos Pandora y Bananito por cada uno de los 12 meses del año.
+
+```{r}
+# Carga de datos desde un archivo CSV
+rios <-   
+  read.csv(file = 'https://raw.githubusercontent.com/tpb728O-programaciongeoespacialr/2021ii/main/datos/hidrologia/fdc/fdc.csv')
+```
+
+```{r cambio-nombre}
+# Cambio de nombre de las columnas mediante rename()
+rios <-
+  rios %>%
+  rename(fecha = Tiempo,
+         pandora = Pandora.mm..637km2.,
+         banano = Banano.mm..90km2.)
+```
+
+```{r conversion-datos}
+# Conversión de una columna a tipo Date y creación de una nueva columna
+rios <-
+  rios %>%
+  mutate(fecha = as.Date(fecha, format = "%m/%d/%Y"),
+         promedio = (pandora + banano) / 2)
+```
+
+
 
 
