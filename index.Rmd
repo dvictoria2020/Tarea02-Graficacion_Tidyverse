@@ -2,9 +2,30 @@
 title: "Tarea #2 Graficación y Tidyverse"
 output: html_document
 ---
-```{r}
+```{r dplye}
 # dplyr
 library(dplyr)
+```
+
+```{r}
+# Carga de graphics
+library(graphics)
+```
+
+```{r}
+# Carga de ggplot2
+library(ggplot2)
+```
+
+```{r}
+# Carga de plotly
+library(plotly)
+```
+
+
+```{r}
+# Carga de tidyverse
+library(tidyverse)
 ```
 
 
@@ -16,23 +37,35 @@ rios <-
   read.csv(file = 'https://raw.githubusercontent.com/tpb728O-programaciongeoespacialr/2021ii/main/datos/hidrologia/fdc/fdc.csv')
 ```
 
-```{r cambio-nombre}
+```{r} 
 # Cambio de nombre de las columnas mediante rename()
-rios <-
+rios <-  
   rios %>%
-  rename(fecha = Tiempo,
+  rename(fecha = Tiempo,  
          pandora = Pandora.mm..637km2.,
          banano = Banano.mm..90km2.)
 ```
 
-```{r conversion-datos}
+```{r}
 # Conversión de una columna a tipo Date y creación de una nueva columna
 rios <-
   rios %>%
-  mutate(fecha = as.Date(fecha, format = "%m/%d/%Y"),
+  mutate (fecha = as.Date(fecha, format = "%m/%d/%Y"),
          promedio = (pandora + banano) / 2)
 ```
 
 
+```{r pandora}
+# Selección, renombramiento, filtrado y conversión de columnas
+rios_sumarizado_x_mes <-
+  rios %>%
+  select(fecha, pandora, banano) %>%
+  rename(fecha = fecha, caudal_pandora = pandora, caudal_banano = banano) %>%
+  mutate(fecha = as.Date(fecha, format = "%d/%m/%Y")) %>%
+  group_by( mes = format(fecha,"%m")) %>%
+  summarise(suma_caudal_pandora = sum(caudal_pandora ), suma_caudal_banano = sum(caudal_banano))
 
+# Despliegue del data frame con los resultados
+rios_sumarizado_x_mes
+```
 

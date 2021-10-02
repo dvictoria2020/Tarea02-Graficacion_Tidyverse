@@ -178,22 +178,114 @@ library(dplyr)</code></pre>
 <pre><code>## The following objects are masked from &#39;package:base&#39;:
 ## 
 ##     intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code># Carga de graphics
+library(graphics)</code></pre>
+<pre class="r"><code># Carga de ggplot2
+library(ggplot2)</code></pre>
+<pre class="r"><code># Carga de plotly
+library(plotly)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;plotly&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     last_plot</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter</code></pre>
+<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     layout</code></pre>
+<pre class="r"><code># Carga de tidyverse
+library(tidyverse)</code></pre>
+<pre><code>## -- Attaching packages --------------------------------------- tidyverse 1.3.1 --</code></pre>
+<pre><code>## v tibble  3.1.3     v purrr   0.3.4
+## v tidyr   1.1.3     v stringr 1.4.0
+## v readr   2.0.1     v forcats 0.5.1</code></pre>
+<pre><code>## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x plotly::filter() masks dplyr::filter(), stats::filter()
+## x dplyr::lag()     masks stats::lag()</code></pre>
 <div id="gráfico-de-barras-apiladas-que-muestre-el-caudal-de-los-ríos-pandora-y-bananito-por-cada-uno-de-los-12-meses-del-año." class="section level2">
 <h2>1. Gráfico de barras apiladas que muestre el caudal de los ríos Pandora y Bananito por cada uno de los 12 meses del año.</h2>
 <pre class="r"><code># Carga de datos desde un archivo CSV
 rios &lt;-   
   read.csv(file = &#39;https://raw.githubusercontent.com/tpb728O-programaciongeoespacialr/2021ii/main/datos/hidrologia/fdc/fdc.csv&#39;)</code></pre>
 <pre class="r"><code># Cambio de nombre de las columnas mediante rename()
-rios &lt;-
+rios &lt;-  
   rios %&gt;%
-  rename(fecha = Tiempo,
+  rename(fecha = Tiempo,  
          pandora = Pandora.mm..637km2.,
          banano = Banano.mm..90km2.)</code></pre>
 <pre class="r"><code># Conversión de una columna a tipo Date y creación de una nueva columna
 rios &lt;-
   rios %&gt;%
-  mutate(fecha = as.Date(fecha, format = &quot;%m/%d/%Y&quot;),
+  mutate (fecha = as.Date(fecha, format = &quot;%m/%d/%Y&quot;),
          promedio = (pandora + banano) / 2)</code></pre>
+<pre class="r"><code># Selección, renombramiento, filtrado y conversión de columnas
+rios_sumarizado_x_mes &lt;-
+  rios %&gt;%
+  select(fecha, pandora, banano) %&gt;%
+  rename(fecha = fecha, caudal_pandora = pandora, caudal_banano = banano) %&gt;%
+  mutate(fecha = as.Date(fecha, format = &quot;%d/%m/%Y&quot;)) %&gt;%
+  group_by( mes = format(fecha,&quot;%m&quot;)) %&gt;%
+  summarise(suma_caudal_pandora = sum(caudal_pandora ), suma_caudal_banano = sum(caudal_banano))
+
+# Despliegue del data frame con los resultados
+rios_sumarizado_x_mes</code></pre>
+<pre><code>## # A tibble: 12 x 3
+##    mes   suma_caudal_pandora suma_caudal_banano
+##    &lt;chr&gt;               &lt;dbl&gt;              &lt;dbl&gt;
+##  1 01                  1523.              4265.
+##  2 02                  1240.              3655.
+##  3 03                  1243.              2699.
+##  4 04                  1275.              3163.
+##  5 05                  1392.              4646.
+##  6 06                  1898.              5302.
+##  7 07                  2484.              6013.
+##  8 08                  2441.              4768.
+##  9 09                  1567.              4016.
+## 10 10                  1710.              4211.
+## 11 11                  1776.              5877.
+## 12 12                  2442.              6284.</code></pre>
+<pre class="r"><code># Carga de datos desde un archivo CSV
+covid &lt;- 
+  read.csv(
+    file=&#39;https://raw.githubusercontent.com/tpb728O-programaciongeoespacialr/2021ii/main/datos/minsalud/covid/ultimafecha_CSV_GENERAL.csv&#39;, 
+    sep = &quot;,&quot;
+  )</code></pre>
+<pre class="r"><code># Selección, renombramiento, filtrado y conversión de columnas
+covid_positivos_nuevos_sumarizado_x_mes &lt;-
+  covid %&gt;%
+  select(FECHA, nue_posi) %&gt;%
+  rename(fecha = FECHA, positivos_nuevos = nue_posi) %&gt;%
+  mutate(fecha = as.Date(fecha, format = &quot;%d/%m/%Y&quot;)) %&gt;%
+  group_by(anio = format(fecha,&quot;%Y&quot;), mes = format(fecha,&quot;%m&quot;)) %&gt;%
+  summarise(suma_positivos = sum(positivos_nuevos))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;anio&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code># Despliegue del data frame con los resultados
+covid_positivos_nuevos_sumarizado_x_mes</code></pre>
+<pre><code>## # A tibble: 19 x 3
+## # Groups:   anio [2]
+##    anio  mes   suma_positivos
+##    &lt;chr&gt; &lt;chr&gt;          &lt;int&gt;
+##  1 2020  03               347
+##  2 2020  04               372
+##  3 2020  05               337
+##  4 2020  06              2403
+##  5 2020  07             14361
+##  6 2020  08             23467
+##  7 2020  09             34473
+##  8 2020  10             34211
+##  9 2020  11             29667
+## 10 2020  12             29683
+## 11 2021  01             24959
+## 12 2021  02             10626
+## 13 2021  03             12440
+## 14 2021  04             33645
+## 15 2021  05             67995
+## 16 2021  06             48952
+## 17 2021  07             40262
+## 18 2021  08             55526
+## 19 2021  09             33010</code></pre>
 </div>
 
 
