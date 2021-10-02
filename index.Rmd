@@ -71,21 +71,49 @@ rios_sumarizado_x_mes
 
 ```{r}
 # Generación de gráfico de barras apiladas
-rios_sumarizado_x_mes_ <-
-  rios %>%
-  dplyr::count(fecha, suma_caudal_pandora, suma_caudal_banano)
+#rios_sumarizado_x_mes_ <-
+  #rios %>%
+ #dplyr::count(fecha, suma_caudal_pandora, suma_caudal_banano)
 
 # Grafico de barras apiladas
-ggplot(
-  rios_sumarizado_x_mes_,
-  aes(x = fecha, y = n)
-  ) +
-  geom_col() +
-  coord_flip()
+#ggplot(
+  #rios_sumarizado_x_mes_,
+  #aes(x = fecha, y = n)) +
+  #geom_col() +
+  #coord_flip()
 
-rlang::last_error()
 ```
 
+
+
+## 2 Realizar un histograma que muestre la distribución de los casos nuevos de covid en Costa Rica.
+
+```{r}
+# Carga de datos desde un archivo CSV
+covid <- 
+  read.csv(
+    file='https://raw.githubusercontent.com/tpb728O-programaciongeoespacialr/2021ii/main/datos/minsalud/covid/ultimafecha_CSV_GENERAL.csv', 
+    sep = ","
+  )
+```
+
+```{r histograma}
+covid_ <-
+  covid %>%
+  select(FECHA, nue_posi) %>%
+  rename(fecha = FECHA, positivos_nuevos = nue_posi) %>%
+  mutate(fecha = as.Date(fecha, format = "%d/%m/%Y"))
+```
+  
+```{r histograma_}
+# Histograma Casos nuevos de COVID-19
+ggplot(covid_, aes(x = fecha, y = positivos_nuevos)) +
+  geom_histogram(stat= 'identity', color= "light blue", binwidth = 5) +
+  ggtitle("Distribución de casos nuevos de Covid-19 en Costa Rica") +
+  xlab("Fecha")+
+  ylab("Total de casos")+
+  theme_dark()
+```
 
 
 
