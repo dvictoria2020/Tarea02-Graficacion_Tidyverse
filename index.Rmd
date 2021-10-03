@@ -47,7 +47,7 @@ rios <-
 ```
 
 ```{r}
-# Conversión de una columna a tipo Date y creación de una nueva columna
+# Conversión de una columna a tipo Date
 rios <-
   rios %>%
   mutate (fecha = as.Date(fecha, format = "%m/%d/%Y"),
@@ -63,25 +63,23 @@ rios_sumarizado_x_mes <-
   rename(fecha = fecha, caudal_pandora = pandora, caudal_banano = banano) %>%
   mutate(fecha = as.Date(fecha, format = "%d/%m/%Y")) %>%
   group_by( mes = format(fecha,"%m")) %>%
-  summarise(suma_caudal_pandora = sum(caudal_pandora ), suma_caudal_banano = sum(caudal_banano))
+  summarise(suma_caudal_pandora = sum(caudal_pandora), suma_caudal_banano = sum(caudal_banano))
 
 # Despliegue del data frame con los resultados
 rios_sumarizado_x_mes
 ```
 
 ```{r}
-# Generación de gráfico de barras apiladas
-#rios_sumarizado_x_mes_ <-
-  #rios %>%
- #dplyr::count(fecha, suma_caudal_pandora, suma_caudal_banano)
-
 # Grafico de barras apiladas
-#ggplot(
-  #rios_sumarizado_x_mes_,
-  #aes(x = fecha, y = n)) +
-  #geom_col() +
-  #coord_flip()
-
+ggplot(
+  rios_sumarizado_x_mes,
+  aes(x = mes, y= (suma_caudal_pandora) , (suma_caudal_banano))) +
+  geom_col() +
+  coord_flip() +
+  ggtitle( "Caudal total por mes de los río Pandora y Banano, Limón, Costa Rica") +
+  xlab("Mes") +
+  ylab("Caudal") +
+  theme_light()
 ```
 
 
@@ -108,13 +106,65 @@ covid_ <-
 ```{r histograma_}
 # Histograma Casos nuevos de COVID-19
 ggplot(covid_, aes(x = fecha, y = positivos_nuevos)) +
-  geom_histogram(stat= 'identity', color= "light blue", binwidth = 5) +
+  geom_histogram(stat= 'identity', color= "light blue", binwidth = 0.1) +
   ggtitle("Distribución de casos nuevos de Covid-19 en Costa Rica") +
   xlab("Fecha")+
   ylab("Total de casos")+
   theme_dark()
 ```
 
+## 3 Gráfico de barras agrupadas que muestre la cantidad de hombres y mujeres fallecidos por covid en Costa Rica por cada uno de los 12 meses del año.
 
+```{r covid}
+# Carga de datos desde un archivo CSV
+covid <- 
+  read.csv(
+    file='https://raw.githubusercontent.com/tpb728O-programaciongeoespacialr/2021ii/main/datos/minsalud/covid/ultimafecha_CSV_GENERAL.csv', 
+    sep = ","
+  )
+```
+
+```{r cambio-columnas} 
+# Cambio de nombre de las columnas mediante rename()
+covid <-  
+  covid %>%
+  rename(fecha = FECHA,  
+         mujeres_fallecidas = muj_fall,
+         hombres_fallecidos = hom_fall)
+```
+
+```{r conversion-datos}
+# Conversión de una columna a tipo Date
+covid <-
+  covid %>%
+  mutate (fecha = as.Date(fecha, format = "%m/%d/%Y"),
+         promedio = (mujeres_fallecidas + hombres_fallecidos) / 2)
+```
+
+```{r covid-seleccion}
+# Selección, renombramiento, filtrado y conversión de columnas
+covid_sumarizado_x_mes <-
+  covid %>%
+  select(fecha, mujeres_fallecidas, hombres_fallecidos) %>%
+  rename(fecha = fecha, mujeres = mujeres_fallecidas, hombres = hombres_fallecidos) %>%
+  mutate(fecha = as.Date(fecha, format = "%d/%m/%Y")) %>%
+  group_by( mes = format(fecha,"%m")) %>%
+  summarise(suma_mujeres_fallecidas = sum(mujeres), suma_hombres_fallecidos = sum(hombres))
+
+# Despliegue del data frame con los resultados
+covid_sumarizado_x_mes
+```
+
+```{r grafico-agrupadas}
+# Grafico de barras agrupadas
+ggplot(
+  covid_sumarizado_x_mes,
+  aes(x = mes, y= (suma_mujeres_fallecidas) , (suma_hombres_fallecidos))) +
+  geom_col(position= "dodge") +
+  ggtitle( "Total mujeres y hombres fallecidos") +
+  xlab("Mes") +
+  ylab("Fallecimientos") +
+  theme_light()
+```
 
 
