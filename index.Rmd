@@ -28,6 +28,19 @@ library(plotly)
 library(tidyverse)
 ```
 
+```{r}
+# Carga de hrbrthemes
+library(hrbrthemes)
+```
+
+```{r}
+# Carga de sqldf
+```
+
+```{r}
+# carga de tid 
+```
+
 
 ## 1. Gráfico de barras apiladas que muestre el caudal de los ríos Pandora y Bananito por cada uno de los 12 meses del año.
 
@@ -37,22 +50,18 @@ rios <-
   read.csv(file = 'https://raw.githubusercontent.com/tpb728O-programaciongeoespacialr/2021ii/main/datos/hidrologia/fdc/fdc.csv')
 ```
 
+
 ```{r} 
 # Cambio de nombre de las columnas mediante rename()
 rios <-  
   rios %>%
   rename(fecha = Tiempo,  
          pandora = Pandora.mm..637km2.,
-         banano = Banano.mm..90km2.)
-```
-
-```{r}
-# Conversión de una columna a tipo Date
-rios <-
-  rios %>%
+         banano = Banano.mm..90km2.)%>%
   mutate (fecha = as.Date(fecha, format = "%m/%d/%Y"),
          promedio = (pandora + banano) / 2)
 ```
+
 
 
 ```{r pandora}
@@ -73,13 +82,13 @@ rios_sumarizado_x_mes
 # Grafico de barras apiladas
 ggplot(
   rios_sumarizado_x_mes,
-  aes(x = mes, y= (suma_caudal_pandora) , (suma_caudal_banano))) +
-  geom_col() +
+  aes(x = mes, y= (suma_caudal_pandora) , (suma_caudal_banano)), fill= color) +
+  geom_col(position = "dodge") +
   coord_flip() +
   ggtitle( "Caudal total por mes de los río Pandora y Banano, Limón, Costa Rica") +
   xlab("Mes") +
   ylab("Caudal") +
-  theme_light()
+  theme_gray(base_size = 12)
 ```
 
 
@@ -106,11 +115,11 @@ covid_ <-
 ```{r histograma_}
 # Histograma Casos nuevos de COVID-19
 ggplot(covid_, aes(x = fecha, y = positivos_nuevos)) +
-  geom_histogram(stat= 'identity', color= "light blue", binwidth = 0.1) +
+  geom_histogram(binwidth = 5, stat= 'identity', color= "light blue" ) +
   ggtitle("Distribución de casos nuevos de Covid-19 en Costa Rica") +
   xlab("Fecha")+
   ylab("Total de casos")+
-  theme_dark()
+  theme_ipsum()
 ```
 
 ## 3 Gráfico de barras agrupadas que muestre la cantidad de hombres y mujeres fallecidos por covid en Costa Rica por cada uno de los 12 meses del año.
@@ -128,15 +137,11 @@ covid <-
 # Cambio de nombre de las columnas mediante rename()
 covid <-  
   covid %>%
-  rename(fecha = FECHA,  
-         mujeres_fallecidas = muj_fall,
-         hombres_fallecidos = hom_fall)
-```
-
-```{r conversion-datos}
-# Conversión de una columna a tipo Date
-covid <-
-  covid %>%
+  select(FECHA, muj_fall, hom_fall) %>%
+  rename(
+    fecha = FECHA,  
+    mujeres_fallecidas = muj_fall,
+    hombres_fallecidos = hom_fall)%>%
   mutate (fecha = as.Date(fecha, format = "%m/%d/%Y"),
          promedio = (mujeres_fallecidas + hombres_fallecidos) / 2)
 ```
