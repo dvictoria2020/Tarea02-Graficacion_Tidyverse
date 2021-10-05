@@ -12,23 +12,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 
 ```{r carga-librerias, message = FALSE}
-# Carga de librería dplyr
+# Carga de librerías: dplyr, ggplot2 y tidyverse
 library(dplyr)
-
-# Carga de librería graphics
-library(graphics)
-
-# Carga de librería ggplot2
 library(ggplot2)
-
-# Carga de librería plotly
-library(plotly)
-
-# Carga de librería tidyverse
 library(tidyverse)
 
-# Carga de librería hrbrthemes
-library(hrbrthemes)
 ```
 
 
@@ -49,6 +37,7 @@ rios <-
          pandora = Pandora.mm..637km2.,
          bananito = Banano.mm..90km2.)%>%
   mutate (fecha = as.Date(fecha, format = "%m/%d/%Y"))
+  
 ```
 
 
@@ -81,7 +70,6 @@ ggplot() + geom_col(
   ylab("Caudal") +
   scale_fill_manual(values = c("#AFEEEE", "steelblue3")) +
   theme(
-    legend.box = "vertical",
     legend.title = element_blank(),
     legend.position = "right",
     plot.title = element_text(size = 14, face = "italic")
@@ -90,7 +78,7 @@ ggplot() + geom_col(
 
 
 
-## 2 Realizar un histograma que muestre la distribución de los casos nuevos de covid en Costa Rica.
+## 2. Realizar un histograma que muestre la distribución de los casos nuevos de covid en Costa Rica.
 
 ```{r}
 # Carga de datos desde un archivo CSV
@@ -116,7 +104,8 @@ ggplot(covid_, aes(x = fecha, y = positivos_nuevos)) +
   ggtitle("Distribución de casos nuevos de Covid-19 en Costa Rica") +
   xlab("Fecha")+
   ylab("Total de casos")+
-  theme_dark()
+  theme_dark(base_size = 14)
+
 ```
 
 ## 3 Realice un gráfico de barras agrupadas que muestre la cantidad de hombres y mujeres fallecidos por covid en Costa Rica por cada uno de los 12 meses del año.
@@ -154,18 +143,18 @@ covid_sumarizado_x_mes
 ggplot() +
   geom_col(
   data = covid_sumarizado_x_mes,
-  aes(x = mes, y = Total_mujeres_fallecidas, fill = "Hombres"),
+  aes(x = mes, y = Total_mujeres_fallecidas, fill = "Mujeres"),
   width = 0.4,
-  position = position_nudge(x = -0.225)
+  position = position_nudge(x = -0.15)
   ) +
   
   geom_col(
     data = covid_sumarizado_x_mes,
-    aes(x = mes, y = Total_hombres_fallecidos, fill = "Mujeres"),
+    aes(x = mes, y = Total_hombres_fallecidos, fill = "Hombres"),
     width = 0.4,
-    position = position_nudge(x = 0.225)
+    position = position_nudge(x = 0.15)
     ) +
-  scale_fill_manual(values = c("grey", "black")) +
+  scale_fill_manual(values = c("#B0E2FF", "#FFC1C1")) +
   ggtitle( "Total mujeres y hombres fallecidos a causa del Covid-19 en Costa Rica") +
   xlab("Mes") +
   ylab("Fallecimientos") +
