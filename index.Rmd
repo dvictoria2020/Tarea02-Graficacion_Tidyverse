@@ -71,22 +71,21 @@ rios_sumarizado_x_mes
 # Grafico de barras apiladas
 ggplot() + geom_col(
   data = rios_sumarizado_x_mes, 
-  aes(x = mes, y= c_bananito, fill = "bananito"), width = 0.7
-)+
+  aes(x = mes,
+      y= c_bananito, fill = "Río Bananito"), width = 0.7)+
   geom_col(
     data= rios_sumarizado_x_mes,
-    aes(x = mes, y = c_pandora, fill = "pandora"), width = 0.7
-) +
-  ggtitle( "Caudal total por mes de los río Pandora y Banano, Limón, Costa Rica") +
+    aes(x = mes, y = c_pandora, fill = "Río Pandora"), width = 0.7) +
+  ggtitle( "Caudal mensual de los ríos Pandora y Bananito, Limón, Costa Rica") +
   xlab("Mes") + 
   ylab("Caudal") +
-  coord_flip()+
-  theme( legend.box = "horizontal", legend.key = element_blank(), legend.title = element_blank(), legend.position = "top"
-  )
-
-        
-  
-  
+  scale_fill_manual(values = c("#AFEEEE", "steelblue3")) +
+  theme(
+    legend.box = "vertical",
+    legend.title = element_blank(),
+    legend.position = "right",
+    plot.title = element_text(size = 14, face = "italic")
+) 
 ```
 
 
@@ -131,28 +130,18 @@ covid <-
   )
 ```
 
-```{r cambio-columnas} 
-# Cambio de nombre de las columnas mediante rename()
-covid <-  
-  covid %>%
-  select(FECHA, muj_fall, hom_fall) %>%
-  rename(
-    fecha = FECHA,  
-    mujeres_fallecidas = muj_fall,
-    hombres_fallecidos = hom_fall)%>%
-  mutate (fecha = as.Date(fecha, format = "%m/%d/%Y"))
-```
-
 ```{r covid-seleccion}
 # Selección, renombramiento, filtrado y conversión de columnas
 covid_sumarizado_x_mes <-
   covid %>%
-  select(fecha, mujeres_fallecidas, hombres_fallecidos) %>%
-  rename(fecha = fecha, mujeres = mujeres_fallecidas, hombres = hombres_fallecidos) %>%
+  select(FECHA, muj_fall, hom_fall) %>%
+  rename(fecha = FECHA,
+         mujeres_fallecidas = muj_fall,
+         hombres_fallecidos = hom_fall) %>%
   mutate(fecha = as.Date(fecha, format = "%d/%m/%Y")) %>%
   group_by( mes = format(fecha,"%m")) %>%
-  summarise(suma_mujeres_fallecidas = sum(mujeres), suma_hombres_fallecidos = sum(hombres))%>%
-filter(mes < 2)
+  summarise(Total_mujeres_fallecidas = sum(mujeres_fallecidas),
+            Total_hombres_fallecidos = sum(hombres_fallecidos))
 
 
 # Despliegue del data frame con los resultados
@@ -162,29 +151,28 @@ covid_sumarizado_x_mes
 
 ```{r grafico-agrupadas}
 # Grafico de barras agrupadas
-ggplot() + geom_col(
+ggplot() +
+  geom_col(
   data = covid_sumarizado_x_mes,
-  aes(x = mes, y = suma_hombres_fallecidos, fill = "hombres fallecidos"),
-  width = 0.4, 
-  position= "dodge"
+  aes(x = mes, y = Total_mujeres_fallecidas, fill = "Hombres"),
+  width = 0.4,
+  position = position_nudge(x = -0.225)
+  ) +
   
-  )+
-  geom_col (
+  geom_col(
     data = covid_sumarizado_x_mes,
-    aes(x = mes, y = suma_mujeres_fallecidas, fill = "mujeres fallecidas"),
+    aes(x = mes, y = Total_hombres_fallecidos, fill = "Mujeres"),
     width = 0.4,
-    position= "dodge"
-    )+
-  
+    position = position_nudge(x = 0.225)
+    ) +
+  scale_fill_manual(values = c("grey", "black")) +
   ggtitle( "Total mujeres y hombres fallecidos a causa del Covid-19 en Costa Rica") +
   xlab("Mes") +
   ylab("Fallecimientos") +
   theme(
-    legend.box = "horizontal",
-    legend.key = element_blank(),
+    legend.box = "vertical",
     legend.title = element_blank(),
-    legend.position = "top"  )
-
+    )
 ```
 
 
