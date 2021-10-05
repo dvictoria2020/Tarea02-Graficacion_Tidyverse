@@ -1,48 +1,38 @@
 ---
 title: "Tarea #2 Graficación y Tidyverse"
 output: html_document
+
+
 ---
-```{r dplye}
-# dplyr
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+
+```{r carga-librerias, message = FALSE}
+# Carga de librería dplyr
 library(dplyr)
-```
 
-```{r}
-# Carga de graphics
+# Carga de librería graphics
 library(graphics)
-```
 
-```{r}
-# Carga de ggplot2
+# Carga de librería ggplot2
 library(ggplot2)
-```
 
-```{r}
-# Carga de plotly
+# Carga de librería plotly
 library(plotly)
-```
 
-
-```{r}
-# Carga de tidyverse
+# Carga de librería tidyverse
 library(tidyverse)
-```
 
-```{r}
-# Carga de hrbrthemes
+# Carga de librería hrbrthemes
 library(hrbrthemes)
 ```
 
-```{r}
-# Carga de sqldf
-```
 
-```{r}
-# carga de tid 
-```
-
-
-## 1. Gráfico de barras apiladas que muestre el caudal de los ríos Pandora y Bananito por cada uno de los 12 meses del año.
+## 1. Realice un gráfico de barras apiladas que muestre el caudal de los ríos Pandora y Bananito por cada uno de los 12 meses del año.
 
 ```{r}
 # Carga de datos desde un archivo CSV
@@ -57,38 +47,46 @@ rios <-
   rios %>%
   rename(fecha = Tiempo,  
          pandora = Pandora.mm..637km2.,
-         banano = Banano.mm..90km2.)%>%
-  mutate (fecha = as.Date(fecha, format = "%m/%d/%Y"),
-         promedio = (pandora + banano) / 2)
+         bananito = Banano.mm..90km2.)%>%
+  mutate (fecha = as.Date(fecha, format = "%m/%d/%Y"))
 ```
 
 
 
-```{r pandora}
+```{r pandora-bananito-sumarizado}
 # Selección, renombramiento, filtrado y conversión de columnas
 rios_sumarizado_x_mes <-
   rios %>%
-  select(fecha, pandora, banano) %>%
-  rename(fecha = fecha, caudal_pandora = pandora, caudal_banano = banano) %>%
+  select(fecha, pandora, bananito) %>%
+  rename(fecha = fecha, caudal_pandora = pandora, caudal_bananito = bananito) %>%
   mutate(fecha = as.Date(fecha, format = "%d/%m/%Y")) %>%
   group_by( mes = format(fecha,"%m")) %>%
-  summarise(suma_caudal_pandora = sum(caudal_pandora), suma_caudal_banano = sum(caudal_banano))
+  summarise(c_pandora = sum(caudal_pandora), c_bananito = sum(caudal_bananito))
 
 # Despliegue del data frame con los resultados
 rios_sumarizado_x_mes
 ```
 
-```{r}
+```{r apiladas}
 # Grafico de barras apiladas
-ggplot(
-  rios_sumarizado_x_mes,
-  aes(x = mes, y= (suma_caudal_pandora) , (suma_caudal_banano)), fill= color) +
-  geom_col(position = "dodge") +
-  coord_flip() +
+ggplot() + geom_col(
+  data = rios_sumarizado_x_mes, 
+  aes(x = mes, y= c_bananito, fill = "bananito"), width = 0.7
+)+
+  geom_col(
+    data= rios_sumarizado_x_mes,
+    aes(x = mes, y = c_pandora, fill = "pandora"), width = 0.7
+) +
   ggtitle( "Caudal total por mes de los río Pandora y Banano, Limón, Costa Rica") +
-  xlab("Mes") +
+  xlab("Mes") + 
   ylab("Caudal") +
-  theme_gray(base_size = 12)
+  coord_flip()+
+  theme( legend.box = "horizontal", legend.key = element_blank(), legend.title = element_blank(), legend.position = "top"
+  )
+
+        
+  
+  
 ```
 
 
@@ -115,14 +113,14 @@ covid_ <-
 ```{r histograma_}
 # Histograma Casos nuevos de COVID-19
 ggplot(covid_, aes(x = fecha, y = positivos_nuevos)) +
-  geom_histogram(binwidth = 5, stat= 'identity', color= "light blue" ) +
+  geom_histogram(binwidth = 0.1, stat= 'identity', color= "light blue" ) +
   ggtitle("Distribución de casos nuevos de Covid-19 en Costa Rica") +
   xlab("Fecha")+
   ylab("Total de casos")+
-  theme_ipsum()
+  theme_dark()
 ```
 
-## 3 Gráfico de barras agrupadas que muestre la cantidad de hombres y mujeres fallecidos por covid en Costa Rica por cada uno de los 12 meses del año.
+## 3 Realice un gráfico de barras agrupadas que muestre la cantidad de hombres y mujeres fallecidos por covid en Costa Rica por cada uno de los 12 meses del año.
 
 ```{r covid}
 # Carga de datos desde un archivo CSV
@@ -142,8 +140,7 @@ covid <-
     fecha = FECHA,  
     mujeres_fallecidas = muj_fall,
     hombres_fallecidos = hom_fall)%>%
-  mutate (fecha = as.Date(fecha, format = "%m/%d/%Y"),
-         promedio = (mujeres_fallecidas + hombres_fallecidos) / 2)
+  mutate (fecha = as.Date(fecha, format = "%m/%d/%Y"))
 ```
 
 ```{r covid-seleccion}
@@ -154,22 +151,41 @@ covid_sumarizado_x_mes <-
   rename(fecha = fecha, mujeres = mujeres_fallecidas, hombres = hombres_fallecidos) %>%
   mutate(fecha = as.Date(fecha, format = "%d/%m/%Y")) %>%
   group_by( mes = format(fecha,"%m")) %>%
-  summarise(suma_mujeres_fallecidas = sum(mujeres), suma_hombres_fallecidos = sum(hombres))
+  summarise(suma_mujeres_fallecidas = sum(mujeres), suma_hombres_fallecidos = sum(hombres))%>%
+filter(mes < 2)
+
 
 # Despliegue del data frame con los resultados
 covid_sumarizado_x_mes
 ```
 
+
 ```{r grafico-agrupadas}
 # Grafico de barras agrupadas
-ggplot(
-  covid_sumarizado_x_mes,
-  aes(x = mes, y= (suma_mujeres_fallecidas) , (suma_hombres_fallecidos))) +
-  geom_col(position= "dodge") +
-  ggtitle( "Total mujeres y hombres fallecidos") +
+ggplot() + geom_col(
+  data = covid_sumarizado_x_mes,
+  aes(x = mes, y = suma_hombres_fallecidos, fill = "hombres fallecidos"),
+  width = 0.4, 
+  position= "dodge"
+  
+  )+
+  geom_col (
+    data = covid_sumarizado_x_mes,
+    aes(x = mes, y = suma_mujeres_fallecidas, fill = "mujeres fallecidas"),
+    width = 0.4,
+    position= "dodge"
+    )+
+  
+  ggtitle( "Total mujeres y hombres fallecidos a causa del Covid-19 en Costa Rica") +
   xlab("Mes") +
   ylab("Fallecimientos") +
-  theme_light()
+  theme(
+    legend.box = "horizontal",
+    legend.key = element_blank(),
+    legend.title = element_blank(),
+    legend.position = "top"  )
+
 ```
+
 
 
