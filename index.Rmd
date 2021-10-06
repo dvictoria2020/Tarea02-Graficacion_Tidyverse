@@ -1,5 +1,6 @@
 ---
 title: "Tarea #2 Graficación y Tidyverse"
+subtitle: "Elaborado por: Victoria Delgado Fernández"
 output: html_document
 
 
@@ -100,15 +101,16 @@ covid_ <-
 ```{r histograma_}
 # Histograma Casos nuevos de COVID-19
 ggplot(covid_, aes(x = fecha, y = positivos_nuevos)) +
-  geom_histogram(binwidth = 0.1, stat= 'identity', color= "light blue" ) +
-  ggtitle("Distribución de casos nuevos de Covid-19 en Costa Rica") +
+  geom_histogram(binwidth = 200, stat= 'identity', color= "light blue" ) +
+  ggtitle("Distribución de casos nuevos de Covid-19 en Costa Rica
+          desde marzo 2020 a septiembre 2021") +
   xlab("Fecha")+
   ylab("Total de casos")+
   theme_dark(base_size = 14)
 
 ```
 
-## 3 Realice un gráfico de barras agrupadas que muestre la cantidad de hombres y mujeres fallecidos por covid en Costa Rica por cada uno de los 12 meses del año.
+## 3. Realice un gráfico de barras agrupadas que muestre la cantidad de hombres y mujeres fallecidos por covid en Costa Rica por cada uno de los 12 meses del año.
 
 ```{r covid}
 # Carga de datos desde un archivo CSV
@@ -129,9 +131,8 @@ covid_sumarizado_x_mes <-
          hombres_fallecidos = hom_fall) %>%
   mutate(fecha = as.Date(fecha, format = "%d/%m/%Y")) %>%
   group_by( mes = format(fecha,"%m")) %>%
-  summarise(Total_mujeres_fallecidas = sum(mujeres_fallecidas),
-            Total_hombres_fallecidos = sum(hombres_fallecidos))
-
+  summarise(Sumatoria_mujeres = sum(mujeres_fallecidas),
+            Sumatoria_hombres = sum(hombres_fallecidos))
 
 # Despliegue del data frame con los resultados
 covid_sumarizado_x_mes
@@ -143,26 +144,25 @@ covid_sumarizado_x_mes
 ggplot() +
   geom_col(
   data = covid_sumarizado_x_mes,
-  aes(x = mes, y = Total_mujeres_fallecidas, fill = "Mujeres"),
-  width = 0.4,
+  aes(x = mes, y = Sumatoria_mujeres, fill = "Mujeres"),
+  width = 0.5,
   position = position_nudge(x = -0.15)
   ) +
   
   geom_col(
     data = covid_sumarizado_x_mes,
-    aes(x = mes, y = Total_hombres_fallecidos, fill = "Hombres"),
-    width = 0.4,
+    aes(x = mes, y = Sumatoria_hombres, fill = "Hombres"),
+    width = 0.5,
     position = position_nudge(x = 0.15)
     ) +
   scale_fill_manual(values = c("#B0E2FF", "#FFC1C1")) +
-  ggtitle( "Total mujeres y hombres fallecidos a causa del Covid-19 en Costa Rica") +
+  ggtitle( "Total acumulado de fallecidos por hombre y mujer
+           a causa del Covid-19 en Costa Rica") +
   xlab("Mes") +
   ylab("Fallecimientos") +
   theme(
     legend.box = "vertical",
     legend.title = element_blank(),
-    )
+    plot.title = element_text(size = 16, face = "plain")
+  )
 ```
-
-
-
